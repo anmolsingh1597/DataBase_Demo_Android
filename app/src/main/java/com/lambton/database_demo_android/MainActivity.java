@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -74,12 +75,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
         String joiningDate = simpleDateFormat.format(cal.getTime());
 
-        if(!name.isEmpty()){
+        if(name.isEmpty()){
             etName.setError("Name field cannot be empty");
             etName.requestFocus();
             return;
         }
-        if(!salary.isEmpty()){
+        if(salary.isEmpty()){
             etSalary.setError("Name field cannot be empty");
             etSalary.requestFocus();
             return;
@@ -88,5 +89,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String sql = "INSERT INTO employee (name, department, joining_date, salary)" +
                 "VALUES (?, ?, ?, ?)";
         sqLiteDatabase.execSQL(sql, new String[]{name, department, joiningDate, salary});
+
+        etName.setText("");
+        etSalary.setText("");
+        Toast.makeText(this, "Employee is added", Toast.LENGTH_SHORT).show();
     }
 }

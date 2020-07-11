@@ -49,6 +49,8 @@ public class EmployeeActivity extends AppCompatActivity {
             cursor.close();
         }
         // create an adapter to display the employees
+        EmployeeAdapter employeeAdapter = new EmployeeAdapter(this, R.layout.list_layout_employee,employeeList,sqLiteDatabase);
+        employeesListView.setAdapter(employeeAdapter);
 
     }
 }

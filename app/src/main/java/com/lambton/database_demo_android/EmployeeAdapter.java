@@ -60,24 +60,51 @@ public class EmployeeAdapter extends ArrayAdapter {
                 updateEmployee(employee);
             }
 
-            private void updateEmployee(Employee employee) {
+            private void updateEmployee(final Employee employee) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 LayoutInflater layoutInflater = LayoutInflater.from(context);
                 View view = layoutInflater.inflate(R.layout.dialog_update_employee, null);
                 builder.setView(view);
-                AlertDialog alertDialog = builder.create();
+                final AlertDialog alertDialog = builder.create();
                 alertDialog.show();
 
-                EditText name = view.findViewById(R.id.et_name);
-                EditText salary = view.findViewById(R.id.et_salary);
-                Spinner department = view.findViewById(R.id.spinner_dept);
+                final EditText etName = view.findViewById(R.id.et_name);
+                final EditText etSalary = view.findViewById(R.id.et_salary);
+                final Spinner spinnerDept = view.findViewById(R.id.spinner_dept);
 
                 String[] deptArray = context.getResources().getStringArray(R.array.departments);
                 int position = Arrays.asList(deptArray).indexOf(employee.getDepartment());
 
-                name.setText(employee.getName());
-                salary.setText(String.valueOf(employee.getSalary()));
-                department.setSelection(position);
+                etName.setText(employee.getName());
+                etSalary.setText(String.valueOf(employee.getSalary()));
+                spinnerDept.setSelection(position);
+
+                view.findViewById(R.id.btn_update).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String name = etName.getText().toString().trim();
+                        String salary = etSalary.getText().toString().trim();
+                        String department = spinnerDept.getSelectedItem().toString();
+
+                        if(name.isEmpty()){
+                            etName.setError("Name field cannot be empty");
+                            etName.requestFocus();
+                            return;
+                        }
+                        if(salary.isEmpty()){
+                            etSalary.setError("Name field cannot be empty");
+                            etSalary.requestFocus();
+                            return;
+                        }
+
+                        String sql = "UPDATE employee SET name = ?, department = ?, salary = ? WHERE id = ?";
+                        sqLiteDatabase.execSQL(sql, new String[]{
+                                name, department, salary, String.valueOf(employee.getId())
+                        });
+                        loadEmployees();
+                        alertDialog.dismiss();
+                    }
+                });
 
             }
         });
