@@ -8,13 +8,18 @@ import android.os.Bundle;
 import android.widget.ListView;
 
 import com.lambton.database_demo_android.model.Employee;
+import com.lambton.database_demo_android.util.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeActivity extends AppCompatActivity {
 
-    SQLiteDatabase sqLiteDatabase;
+//    SQLiteDatabase sqLiteDatabase;
+
+    // instance of databaseOpenHelper class
+    DatabaseHelper sqLiteDatabase;
+
     List<Employee> employeeList;
     ListView employeesListView;
 
@@ -27,14 +32,18 @@ public class EmployeeActivity extends AppCompatActivity {
 
         employeeList = new ArrayList<>();
 
-        sqLiteDatabase = openOrCreateDatabase(MainActivity.DATABASE_NAME,MODE_PRIVATE,null);
+       // sqLiteDatabase = openOrCreateDatabase(MainActivity.DATABASE_NAME,MODE_PRIVATE,null);
+
+        sqLiteDatabase = new DatabaseHelper(this);
+
         loadEmployees();
     }
 
     private void loadEmployees() {
 
-        String sql = "SELECT * FROM employee";
-        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+//        String sql = "SELECT * FROM employee";
+//        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        Cursor cursor = sqLiteDatabase.getAllEmployees();
         if(cursor.moveToFirst()){
             do{
                 // create an employee instance
@@ -49,7 +58,10 @@ public class EmployeeActivity extends AppCompatActivity {
             cursor.close();
         }
         // create an adapter to display the employees
-        EmployeeAdapter employeeAdapter = new EmployeeAdapter(this, R.layout.list_layout_employee,employeeList,sqLiteDatabase);
+        EmployeeAdapter employeeAdapter = new EmployeeAdapter(this,
+                R.layout.list_layout_employee,
+                employeeList,
+                sqLiteDatabase);
         employeesListView.setAdapter(employeeAdapter);
 
     }

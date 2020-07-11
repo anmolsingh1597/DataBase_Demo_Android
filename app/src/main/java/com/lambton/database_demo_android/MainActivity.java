@@ -10,14 +10,18 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.lambton.database_demo_android.util.DatabaseHelper;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     //Database name
-    public static final String DATABASE_NAME = "myDatabase";
-    SQLiteDatabase sqLiteDatabase;
+   /* public static final String DATABASE_NAME = "myDatabase";
+    SQLiteDatabase sqLiteDatabase;*/
+   //SQLite openHelper
+   DatabaseHelper sqLiteDatabase;
 
     EditText etName, etSalary;
     Spinner spinnerDepartment;
@@ -36,10 +40,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_view_employees).setOnClickListener(this);
 
        // initialize our database
-        sqLiteDatabase = openOrCreateDatabase(DATABASE_NAME,MODE_PRIVATE,null);
-        createTable();
-    }
+     /*   sqLiteDatabase = openOrCreateDatabase(DATABASE_NAME,MODE_PRIVATE,null);
+        createTable();*/
 
+     // initializing  the instance of sqlITE openhelper class
+        sqLiteDatabase = new DatabaseHelper(this);
+    }
+/*
     private void createTable() {
         String sql = "CREATE TABLE IF NOT EXISTS employee (" +
                 "id INTEGER NOT NULL CONSTRAINT employee_pk PRIMARY KEY AUTOINCREMENT, "+
@@ -50,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         sqLiteDatabase.execSQL(sql);
     }
-
+*/
     @Override
     public void onClick(View v) {
 
@@ -85,13 +92,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             etSalary.requestFocus();
             return;
         }
-
+/*
         String sql = "INSERT INTO employee (name, department, joining_date, salary)" +
                 "VALUES (?, ?, ?, ?)";
         sqLiteDatabase.execSQL(sql, new String[]{name, department, joiningDate, salary});
+        */
+
+// insert employee into database table with help of database helper class
+        if(sqLiteDatabase.addEmployee(name, department, joiningDate, Double.valueOf(salary))){
+            Toast.makeText(this, "Employee is inserted", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "Employee is not inserted", Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
 
         etName.setText("");
         etSalary.setText("");
-        Toast.makeText(this, "Employee is added", Toast.LENGTH_SHORT).show();
+        spinnerDepartment.setSelection(0, true);
+
+        etSalary.clearFocus();
+        etName.requestFocus();
     }
 }
