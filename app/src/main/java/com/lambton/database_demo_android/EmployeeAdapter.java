@@ -17,7 +17,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.lambton.database_demo_android.model.Employee;
+//import com.lambton.database_demo_android.model.Employee;
+
+import com.lambton.database_demo_android.room.Employee;
+import com.lambton.database_demo_android.room.EmployeeRoomDb;
 import com.lambton.database_demo_android.util.DatabaseHelper;
 
 import java.util.Arrays;
@@ -30,14 +33,24 @@ public class EmployeeAdapter extends ArrayAdapter {
     List<Employee> employeeList;
 //    SQLiteDatabase sqLiteDatabase;
 
-    DatabaseHelper sqLiteDatabase;
+//    DatabaseHelper sqLiteDatabase;
+
+    EmployeeRoomDb employeeRoomDb;
 
     public EmployeeAdapter(@NonNull Context context, int resource, List<Employee> employeeList, DatabaseHelper sqLiteDatabase) {
         super(context, resource, employeeList);
         this.employeeList = employeeList;
-        this.sqLiteDatabase = sqLiteDatabase;
+//        this.sqLiteDatabase = sqLiteDatabase;
         this.context = context;
         this.layoutRes = resource;
+    }
+
+    public EmployeeAdapter(@NonNull Context context, int resource, List<Employee> employeeList) {
+        super(context, resource, employeeList);
+        this.employeeList = employeeList;
+        this.context = context;
+        this.layoutRes = resource;
+        employeeRoomDb = EmployeeRoomDb.getINSTANCE(context);
     }
 
     @NonNull
@@ -104,10 +117,16 @@ public class EmployeeAdapter extends ArrayAdapter {
 //                        sqLiteDatabase.execSQL(sql, new String[]{
 //                                name, department, salary, String.valueOf(employee.getId())
 //                        });
-                        if(sqLiteDatabase.updateEmployee(employee.getId(), name, department, Double.parseDouble(salary))){
-                            loadEmployees();
+                       /* if(sqLiteDatabase.updateEmployee(employee.getId(), name, department, Double.parseDouble(salary))){
+                            loadEmployees();*/
+
+                       employeeRoomDb.employeeDao().updateEmployee(employee.getId(),
+                               name,
+                               department,
+                               Double.parseDouble(salary));
+                       loadEmployees();
                             alertDialog.dismiss();
-                        }
+
 
                     }
                 });
@@ -129,10 +148,14 @@ public class EmployeeAdapter extends ArrayAdapter {
                     public void onClick(DialogInterface dialog, int which) {
 //                        String sql = "DELETE FROM employee WHERE id = ?";
 //                        sqLiteDatabase.execSQL(sql, new Integer[]{employee.getId()});
-                        if(sqLiteDatabase.deleteEmployee(employee.getId())){
+                       /* if(sqLiteDatabase.deleteEmployee(employee.getId())){
                             loadEmployees();
                         }
+*/
+                       //Room
+                        employeeRoomDb.employeeDao().deleteEmployee(employee.getId());
 
+                        loadEmployees();
                     }
                 });
                 builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -152,7 +175,7 @@ public class EmployeeAdapter extends ArrayAdapter {
     private void loadEmployees() {
 //        String sql = "SELECT * FROM employee";
 //        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
-        Cursor cursor = sqLiteDatabase.getAllEmployees();
+      /*  Cursor cursor = sqLiteDatabase.getAllEmployees();
         employeeList.clear();
         if(cursor.moveToFirst()){
             do{
@@ -166,7 +189,9 @@ public class EmployeeAdapter extends ArrayAdapter {
                 ));
             } while (cursor.moveToNext());
             cursor.close();
-        }
+        }*/
+//        employeeList.clear();
+        employeeList = employeeRoomDb.employeeDao().getAllEmployees();
         notifyDataSetChanged();
     }
 }

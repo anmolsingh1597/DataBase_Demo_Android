@@ -7,7 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.ListView;
 
-import com.lambton.database_demo_android.model.Employee;
+import com.lambton.database_demo_android.room.Employee;
+import com.lambton.database_demo_android.room.EmployeeRoomDb;
 import com.lambton.database_demo_android.util.DatabaseHelper;
 
 import java.util.ArrayList;
@@ -19,6 +20,9 @@ public class EmployeeActivity extends AppCompatActivity {
 
     // instance of databaseOpenHelper class
     DatabaseHelper sqLiteDatabase;
+
+    // Room Db instance
+    private EmployeeRoomDb employeeRoomDb;
 
     List<Employee> employeeList;
     ListView employeesListView;
@@ -34,8 +38,9 @@ public class EmployeeActivity extends AppCompatActivity {
 
        // sqLiteDatabase = openOrCreateDatabase(MainActivity.DATABASE_NAME,MODE_PRIVATE,null);
 
-        sqLiteDatabase = new DatabaseHelper(this);
+//        sqLiteDatabase = new DatabaseHelper(this);
 
+        employeeRoomDb = EmployeeRoomDb.getINSTANCE(this);
         loadEmployees();
     }
 
@@ -43,7 +48,7 @@ public class EmployeeActivity extends AppCompatActivity {
 
 //        String sql = "SELECT * FROM employee";
 //        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
-        Cursor cursor = sqLiteDatabase.getAllEmployees();
+      /*  Cursor cursor = sqLiteDatabase.getAllEmployees();
         if(cursor.moveToFirst()){
             do{
                 // create an employee instance
@@ -56,13 +61,20 @@ public class EmployeeActivity extends AppCompatActivity {
                 ));
             } while (cursor.moveToNext());
             cursor.close();
-        }
+        }*/
+
+      employeeList = employeeRoomDb.employeeDao().getAllEmployees();
+
         // create an adapter to display the employees
-        EmployeeAdapter employeeAdapter = new EmployeeAdapter(this,
+      /*  EmployeeAdapter employeeAdapter = new EmployeeAdapter(this,
                 R.layout.list_layout_employee,
                 employeeList,
                 sqLiteDatabase);
-        employeesListView.setAdapter(employeeAdapter);
+        employeesListView.setAdapter(employeeAdapter);*/
+
+      EmployeeAdapter employeeAdapter = new EmployeeAdapter(this,R.layout.list_layout_employee,
+              employeeList);
+      employeesListView.setAdapter(employeeAdapter);
 
     }
 }
